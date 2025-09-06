@@ -3,7 +3,7 @@
 #define ESP32_LED_BUILTIN 2
 
 #define LED_PIN 18
-#define NUM_LEDS 64
+#define NUM_LEDS 200
 #define BRIGHTNESS 50
 #define LED_TYPE WS2811
 #define COLOR_ORDER RGB
@@ -19,7 +19,7 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available() >= NUM_LEDS * 3) {
+  if (Serial.available()) {
     digitalWrite(ESP32_LED_BUILTIN, HIGH); // Turn LED on when receiving data
     for (int i = 0; i < NUM_LEDS; i++) {
       leds[i].r = Serial.read();
