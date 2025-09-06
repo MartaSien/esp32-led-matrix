@@ -5,12 +5,12 @@ SER = serial.Serial('COM3', 115200)
 MATRIX_SIZE = 64
 
 def send_matrix(colors):
-    # colors is a list of (r, g, b) tuples for each LED
     data = bytearray()
 
     for color in colors:
         data.extend(color)
-        SER.write(data)
+    SER.write(data)
+    print(f"Sent {len(data)} bytes")
 
 if __name__ == "__main__":
     red = (255, 0, 0)

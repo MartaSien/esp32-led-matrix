@@ -1,43 +1,34 @@
-#include <Arduino.h>
-#include <Adafruit_NeoPixel.h>
+#include <FastLED.h>
 
-#define DATA_PIN 12         // Change to your data pin
+#define ESP32_LED_BUILTIN 2
 
-#define MATRIX_WIDTH 27      // prism matrix: 27, test matrix: 8
-#define MATRIX_HEIGHT 7     // prism matrix: 7, test matrix: 8
-#define NUM_LEDS (MATRIX_WIDTH * MATRIX_HEIGHT) // Total number of LEDs
+#define LED_PIN 18
+#define NUM_LEDS 64
+#define BRIGHTNESS 50
+#define LED_TYPE WS2811
+#define COLOR_ORDER RGB
 
-Adafruit_NeoPixel matrix(NUM_LEDS, DATA_PIN, NEO_GRB + NEO_KHZ400); // Use NEO_KHZ400 for prism matrix AND NEO_KHZ800 for test matrix
+CRGB leds[NUM_LEDS];
 
 void setup() {
   Serial.begin(115200);
-  matrix.begin();
-  matrix.show();
+  FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+  FastLED.setBrightness(BRIGHTNESS);
+
+  pinMode(ESP32_LED_BUILTIN, OUTPUT); // Initialize built-in LED pin
 }
 
 void loop() {
-  if (Serial.available() > 1) {
-    uint8_t buffer[NUM_LEDS * 3];
-    Serial.readBytes(buffer, NUM_LEDS * 3);
+  if (Serial.available() >= NUM_LEDS * 3) {
+    digitalWrite(ESP32_LED_BUILTIN, HIGH); // Turn LED on when receiving data
     for (int i = 0; i < NUM_LEDS; i++) {
-      int idx = i * 3;
-      matrix.setPixelColor(i, matrix.Color(buffer[idx], buffer[idx+1], buffer[idx+2]));
+      leds[i].r = Serial.read();
+      leds[i].g = Serial.read();
+      leds[i].b = Serial.read();
     }
-    matrix.show();
-    sleep(1000);
-/*
+    FastLED.show();
   } else {
-    static unsigned long lastBlink = 0;
-    static bool ledOn = false;
-    if (millis() - lastBlink > 1000) {
-      lastBlink = millis();
-      ledOn = !ledOn;
-      uint32_t color = ledOn ? matrix.Color(5, 0, 0) : 0;
-      for (int i = 0; i < NUM_LEDS; i++) {
-        matrix.setPixelColor(i, color);
-      }
-      matrix.show();
-      sleep(200);
-    }*/
+      digitalWrite(ESP32_LED_BUILTIN, LOW);
   }
+  delay(10);
 }
