@@ -2,7 +2,7 @@
 
 #define ESP32_LED_BUILTIN 2
 
-#define LED_PIN 18
+#define LED_PIN 12
 #define NUM_LEDS 200
 #define BRIGHTNESS 50
 #define LED_TYPE WS2811
