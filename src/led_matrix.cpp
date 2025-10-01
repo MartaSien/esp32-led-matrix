@@ -3,7 +3,10 @@
 #define ESP32_LED_BUILTIN 2
 
 #define LED_PIN 12
-#define NUM_LEDS 200
+
+#define MATRIX_WIDTH 27
+#define MATRIX_HEIGHT 7
+#define NUM_LEDS (MATRIX_WIDTH * MATRIX_HEIGHT)
 #define BRIGHTNESS 50
 #define LED_TYPE WS2811
 #define COLOR_ORDER RGB
@@ -19,16 +22,18 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available()) {
-    digitalWrite(ESP32_LED_BUILTIN, HIGH); // Turn LED on when receiving data
+  if (Serial.available() > NUM_LEDS) { // It should be NUM_LEDS * 3 bytes but some margin was needed
+    digitalWrite(ESP32_LED_BUILTIN, HIGH);
+    uint8_t buffer[NUM_LEDS * 3];
+    Serial.readBytes(buffer, NUM_LEDS * 3); // Read all bytes at once
     for (int i = 0; i < NUM_LEDS; i++) {
-      leds[i].r = Serial.read();
-      leds[i].g = Serial.read();
-      leds[i].b = Serial.read();
+      leds[i].r = buffer[i * 3];
+      leds[i].g = buffer[i * 3 + 1];
+      leds[i].b = buffer[i * 3 + 2];
     }
     FastLED.show();
   } else {
-      digitalWrite(ESP32_LED_BUILTIN, LOW);
+    digitalWrite(ESP32_LED_BUILTIN, LOW);
   }
   delay(10);
 }

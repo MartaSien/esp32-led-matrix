@@ -7,7 +7,9 @@ import cv2
 import numpy as np
 
 SER = serial.Serial('COM3', 115200)
-MATRIX_SIZE = 200
+MATRIX_WIDTH = 27
+MATRIX_HEIGHT = 7
+MATRIX_SIZE = (MATRIX_WIDTH * MATRIX_HEIGHT)
 
 def send_matrix(colors):
     """Send the matrix colors to ESP32 as a byte array to serial port."""
@@ -24,13 +26,13 @@ if __name__ == "__main__":
             with mss.mss() as sct:
                 img = sct.grab(sct.monitors[1])
                 im = Image.frombytes('RGB', img.size, img.rgb)
-                im = im.resize((matrix_side, matrix_side)).convert('RGB')
+                im = im.resize((MATRIX_WIDTH, MATRIX_HEIGHT)).convert('RGB')
                 colors = list(im.getdata())
                 
                 # Convert PIL image to OpenCV format
                 im_cv = np.array(im)
                 im_cv = cv2.cvtColor(im_cv, cv2.COLOR_RGB2BGR)
-                im_cv = cv2.resize(im_cv, (400, 400), interpolation=cv2.INTER_NEAREST)
+                im_cv = cv2.resize(im_cv, (270, 70), interpolation=cv2.INTER_NEAREST)
                 cv2.imshow('LED Matrix Preview', im_cv)
                 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
